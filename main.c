@@ -159,11 +159,9 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 			fclose(fp);	
 		}
 		/*AGGIUNGO GLI OGGETTI*/
-<<<<<<< Updated upstream
-=======
+
 		//provq
-		
->>>>>>> Stashed changes
+
 
 		
 	}
