@@ -49,9 +49,9 @@ int main (int argc, char*argv[]){
 	}
 	strcat(filestanze,FSTANZE);
 	strcat(fileobj,FOBJ);
-	
+
 	stanze=generastanze(NSTANZE,filestanze,fileobj);
-	
+
 	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);
 	return 0;
@@ -65,7 +65,7 @@ int main(int argc, char*argv[]){
 	while(!esc){
 		vita=VIVO;
 		win=NOTWIN
-		inizio();	
+		inizio();
 		while(vita&&!win&&!esc){
 			esegui();
 		}
@@ -74,7 +74,7 @@ int main(int argc, char*argv[]){
 		else if(!vita)
 			morto();
 	}
-	return 0;	
+	return 0;
 }*/
 
 void stampastanze(stanza_t** add,int n){
@@ -102,12 +102,12 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	FILE * fp;
 	stanza_t * *stanze, *n, *stanza; /*giusto che siano 2 asterischi, perchè è una malloc di indirizzi*/
 	int tmp, i;
-		
+
 	if(stanze=malloc(numstanze*sizeof(stanza_t*))){
-		for(i=0;i<numstanze;i++) 
+		for(i=0;i<numstanze;i++)
 			if(n=malloc(sizeof(stanza_t)))
 				*(stanze+i)=n;	/*popola la lista delle stanze*/
-		
+
 		/*LEGGO FILE STANZE*/
 		if(fp=fopen(fst, "r")){
 			for(i=0;i<numstanze;i++){		/*assegna ad ogni stanza gli indirizzi delle stanze adiacenti*/
@@ -119,52 +119,52 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 					stanza->nord=NULL;
 				else
 					stanza->nord=*(stanze+tmp);
-				
+
 				/*SUD*/
 				fscanf(fp,"%d",&tmp);
 				if(tmp==-1)
 					stanza->sud=NULL;
 				else
 					stanza->sud=*(stanze+tmp);
-				
+
 				/*EST*/
 				fscanf(fp,"%d",&tmp);
 				if(tmp==-1)
 					stanza->est=NULL;
 				else
 					stanza->est=*(stanze+tmp);
-				
+
 				/*OVEST*/
 				fscanf(fp,"%d",&tmp);
 				if(tmp==-1)
 					stanza->ovest=NULL;
 				else
 					stanza->ovest=*(stanze+tmp);
-				
+
 				/*SU*/
 				fscanf(fp,"%d",&tmp);
 				if(tmp==-1)
 					stanza->su=NULL;
 				else
 					stanza->su=*(stanze+tmp);
-				
+
 				/*GIU*/
 				fscanf(fp,"%d",&tmp);
 				if(tmp==-1)
 					stanza->giu=NULL;
 				else
 					stanza->giu=*(stanze+tmp);
-				
+
 			}
-			fclose(fp);	
+			fclose(fp);
 		}
 		/*AGGIUNGO GLI OGGETTI*/
 
-		//provq
+		//provqmm
 
 
-		
+
 	}
 	return stanze;
-	
+
 }
