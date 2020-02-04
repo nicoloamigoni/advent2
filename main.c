@@ -7,6 +7,7 @@
 
 #define FSTANZE "stanze.txt"
 #define DEFAULTDIR "./default/"
+#define SAVEDIR "./save/"
 #define FOBJSTANZE "stanzeobj.txt"
 #define NSTANZE 5
 #define LENOBJ 15
@@ -47,6 +48,9 @@ int main (int argc, char*argv[]){
 	if(carica=='n'){
 		strcpy(filestanze,DEFAULTDIR);
 		strcpy(fileobj,DEFAULTDIR);
+	} else{
+		strcpy(filestanze,SAVEDIR);
+		strcpy(fileobj,SAVEDIR);	
 	}
 	strcat(filestanze,FSTANZE);
 	strcat(fileobj,FOBJSTANZE);
