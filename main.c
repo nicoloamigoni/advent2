@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+
 #define VIVO 1
 #define MORTO 0
 #define QUIT 0
@@ -10,6 +13,9 @@
 #define FOBJ "obj.txt"
 #define NSTANZE 5
 #define LENOBJ 15
+#define CONTENITORE "in"
+
+
 
 typedef struct _obj{
 	char nome[LENOBJ];
@@ -28,8 +34,12 @@ typedef struct _stanza{
 	obj_t * oggetti;
 }stanza_t;
 
+
+
+
 stanza_t** generastanze(int, char []);
 void stampastanze(stanza_t**,int);
+void delnewline(char []);
 
 
 
@@ -102,7 +112,8 @@ void stampastanze(stanza_t** add,int n){
 stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	FILE * fp;
 	stanza_t * *stanze, *n, *stanza; /*giusto che siano 2 asterischi, perchè è una malloc di indirizzi*/
-	int tmp, i;
+	int tmp, i, j;
+	char obj[LENOBJ]
 
 	if(stanze=malloc(numstanze*sizeof(stanza_t*))){
 		for(i=0;i<numstanze;i++)
@@ -159,11 +170,37 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 			}
 			fclose(fp);
 		}
+
 		/*AGGIUNGO GLI OGGETTI*/
 
-		//prova
-		/*ciao ciao*/
+		if(fp=fopen(fobj, "r")){
+			for(i=0; i<numstanze; i++){
+				fscanf(fp, "%d", &tmp);
+				for(j=0; j<tmp; j++){
+					fgets(obj, LENOBJ, fp);
+					delnewline(obj);		/* la fgets prende anche il carattere newline, che va eliminato */
+
+					if(!strcmp(obj, CONTENITORE))		/* la stringa CONTENITORE indica che gli oggetti */
+						riempicontenitore();					/* che seguono sono contenuti nel precedente */
+
+					else
+						appendobj();
+				}
+			}
+			fclose(fp);
+		}
+
+
 	}
 	return stanze;
+
+}
+
+void delnewline(char s[]){
+	int i;
+
+	for(i=0; s[i]!='\n' && s[i]!='\0'; i++)
+		;
+	s[i]='\0';
 
 }
