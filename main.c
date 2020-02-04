@@ -160,10 +160,6 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 		}
 		/*AGGIUNGO GLI OGGETTI*/
 
-		//provaaaas
-
-
-
 	}
 	return stanze;
 
