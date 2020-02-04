@@ -7,7 +7,7 @@
 
 #define FSTANZE "stanze.txt"
 #define DEFAULTDIR "./default/"
-#define FOBJ "obj.txt"
+#define FOBJSTANZE "stanzeobj.txt"
 #define NSTANZE 5
 #define LENOBJ 15
 
@@ -28,10 +28,10 @@ typedef struct _stanza{
 	obj_t * oggetti;
 }stanza_t;
 
-stanza_t** generastanze(int, char []);
+stanza_t** generastanze(int, char [],char[]); /*genera le stanze e inserisce gli oggetti*/
 void stampastanze(stanza_t**,int);
-
-
+obj_t * objappend(obj_t*,char[]); /*append per gli oggetti*/
+void objprint(obj_t*h);/*stampa una lista di oggetti*/
 
 
 
@@ -49,7 +49,7 @@ int main (int argc, char*argv[]){
 		strcpy(fileobj,DEFAULTDIR);
 	}
 	strcat(filestanze,FSTANZE);
-	strcat(fileobj,FOBJ);
+	strcat(fileobj,FOBJSTANZE);
 
 	stanze=generastanze(NSTANZE,filestanze,fileobj);
 
@@ -95,6 +95,8 @@ void stampastanze(stanza_t** add,int n){
 		printf("SU %d\n",stanza->su->id);
 	if(stanza->giu)
 		printf("GIU %d\n",stanza->giu->id);
+	printf("OGGETTI:\n");
+	objprint(stanza->oggetti);
 	printf("-------------\n\n");
 }
 
@@ -103,6 +105,9 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	FILE * fp;
 	stanza_t * *stanze, *n, *stanza; /*giusto che siano 2 asterischi, perchè è una malloc di indirizzi*/
 	int tmp, i;
+	obj_t * listaobjstanza=NULL;	/*variabili per raccolta oggetti*/
+	int numobj,j;
+	char tmpstr[LENOBJ];
 
 	if(stanze=malloc(numstanze*sizeof(stanza_t*))){
 		for(i=0;i<numstanze;i++)
@@ -160,10 +165,48 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 			fclose(fp);
 		}
 		/*AGGIUNGO GLI OGGETTI*/
+		/*nel file di oggetti, ogni riga corrisponde a una stanza. il primo dato è il numero di oggetti nella stanza, seguono gli oggetti stessi.*/
+		if(fp=fopen(fobj,"r")){
+			for(i=0;i<numstanze;i++){
+				fscanf(fp,"%d ",&numobj);
+				for(j=0;j<numobj;j++){
+					fscanf(fp,"%s ",tmpstr);
+					listaobjstanza=objappend(listaobjstanza,tmpstr);
+				}
+				stanza=*(stanze+i);
+				stanza->oggetti=listaobjstanza;
+				listaobjstanza=NULL;
+			}
 
-
-
+			/*BAULI*/
+		}else
+		 printf("not in");
 	}
 	return stanze;
+}
 
+obj_t * objappend(obj_t*h,char obj[]){
+	obj_t*p,*n;
+	if(n=malloc(sizeof(obj_t))){
+		if(h){
+			for(p=h;p->next;p=p->next)
+				;
+			p->next=n;
+		} else
+			h=n;
+		strcpy(n->nome,obj);
+		n->next=NULL;
+		n->in=NULL;
+
+	}
+	return h;
+
+}
+void objprint(obj_t*h){
+	obj_t* p;
+	for(p=h;p;p=p->next){
+		printf("%s, ",p->nome);
+	}
+	printf("\n");
+	return;
 }

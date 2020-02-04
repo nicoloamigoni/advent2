@@ -1,2 +1,5 @@
-coltello candela
-architrave emaculo gengis
+3 coltello candela giacomo
+2 giovanni giuseppe
+1 torcia
+0
+1 ziogiovanni
