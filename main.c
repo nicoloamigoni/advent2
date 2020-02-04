@@ -35,6 +35,7 @@ void stampastanze(stanza_t**,int);
 
 
 
+
 int main (int argc, char*argv[]){
 	stanza_t**stanze;
 	int i;
@@ -160,7 +161,12 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 		}
 		/*AGGIUNGO GLI OGGETTI*/
 
+<<<<<<< HEAD
 		//prova 
+=======
+		//prova
+		/*ciao ciao*/
+>>>>>>> bbe39ef5f405c10497a56290582e79184ba26db3
 	}
 	return stanze;
 
