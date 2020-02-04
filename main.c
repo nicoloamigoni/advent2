@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #define VIVO 1
 #define MORTO 0
 #define QUIT 0
@@ -50,7 +51,7 @@ int main (int argc, char*argv[]){
 		strcpy(fileobj,DEFAULTDIR);
 	} else{
 		strcpy(filestanze,SAVEDIR);
-		strcpy(fileobj,SAVEDIR);	
+		strcpy(fileobj,SAVEDIR);
 	}
 	strcat(filestanze,FSTANZE);
 	strcat(fileobj,FOBJSTANZE);
