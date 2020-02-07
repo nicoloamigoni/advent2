@@ -1,1 +1,14 @@
-coltello candela
+1
+armatura
+3
+torcia
+libreria
+inside
+3
+libro verde
+libro giallo
+libro rosso
+1
+arpa
+1
+pozione
