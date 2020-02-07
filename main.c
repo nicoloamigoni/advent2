@@ -21,6 +21,7 @@ typedef struct _obj{
 	char nome[LENOBJ];
 	struct _obj *next;
 	struct _obj *in;
+	int open;
 } obj_t;
 
 typedef struct _stanza{
@@ -31,6 +32,7 @@ typedef struct _stanza{
 	struct _stanza * ovest;
 	struct _stanza * su;
 	struct _stanza * giu;
+	int nordopen, sudopen, estopen, ovestopen, suopen, giuopen;
 	obj_t * oggetti;
 }stanza_t;
 
@@ -167,6 +169,14 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 				else
 					stanza->giu=*(stanze+tmp);
 
+				/*APERTURA/CHIUSURA PORTE*/
+				fscanf(fp, "%d", stanza->nordopen);
+				fscanf(fp, "%d", stanza->sudopen);
+				fscanf(fp, "%d", stanza->estopen);
+				fscanf(fp, "%d", stanza->ovestopen);
+				fscanf(fp, "%d", stanza->suopen);
+				fscanf(fp, "%d", stanza->giuopen);
+
 			}
 			fclose(fp);
 		}
@@ -195,6 +205,8 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	return stanze;
 
 }
+
+void riempicontenitore()
 
 void delnewline(char s[]){
 	int i;
