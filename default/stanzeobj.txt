@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 3 coltello candela giacomo
 2 giovanni baule
 1 torcia
@@ -6,3 +7,19 @@
 
 0 giacomo 1 cazzo
 2 baule 2 coltello candela 
+=======
+1
+armatura
+3
+torcia
+libreria
+inside
+3
+libro verde
+libro giallo
+libro rosso
+1
+arpa
+1
+pozione
+>>>>>>> 2a04dd5b726206aa5dd257bc6f9e60b3d2b978b2
