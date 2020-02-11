@@ -34,15 +34,15 @@ stanza_t** generastanze(int, char [],char[]); /*genera le stanze e inserisce gli
 void stampastanze(stanza_t**,int);
 obj_t * objappend(obj_t*,char[]); /*append per gli oggetti*/
 void objprint(obj_t*h);/*stampa una lista di oggetti*/
-
-
+obj_t*objfind(obj_t*,char[]);/*trova un oggetto in una lista e restituisce l'indirizzo*/
+int save(stanza_t**,int, char[], char[]);
 
 
 int main (int argc, char*argv[]){
 	stanza_t**stanze;
 	int i;
-	char carica;
-	char filestanze[50],fileobj[50];
+	char carica,salva;
+	char filestanze[50],fileobj[50], fstsave[50],fobjsave[50];
 	printf("vuoi caricare il salvataggio? (y/n)  ");
 	scanf("%c",&carica);
 	printf("\n");
@@ -60,6 +60,14 @@ int main (int argc, char*argv[]){
 
 	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);
+	strcpy(fstsave,SAVEDIR);
+	strcpy(fobjsave,SAVEDIR);
+	strcat(fstsave,FSTANZE);
+	strcat(fobjsave,FOBJSTANZE);
+
+
+	if(save(stanze, NSTANZE, fstsave, fobjsave))
+		printf("\nsalvataggio avvenuto con successo \n");
 	return 0;
 }
 
@@ -110,7 +118,7 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	FILE * fp;
 	stanza_t * *stanze, *n, *stanza; /*giusto che siano 2 asterischi, perchè è una malloc di indirizzi*/
 	int tmp, i;
-	obj_t * listaobjstanza=NULL;	/*variabili per raccolta oggetti*/
+	obj_t * listaobjtmp=NULL,*p;	/*variabili per raccolta oggetti*/
 	int numobj,j;
 	char tmpstr[LENOBJ];
 
@@ -176,18 +184,78 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 				fscanf(fp,"%d ",&numobj);
 				for(j=0;j<numobj;j++){
 					fscanf(fp,"%s ",tmpstr);
-					listaobjstanza=objappend(listaobjstanza,tmpstr);
+					listaobjtmp=objappend(listaobjtmp,tmpstr);
 				}
 				stanza=*(stanze+i);
-				stanza->oggetti=listaobjstanza;
-				listaobjstanza=NULL;
+				stanza->oggetti=listaobjtmp;
+				listaobjtmp=NULL;
 			}
 
 			/*BAULI*/
+			/*nel file, il primo dato è il numero della stanza, segue il nome del baule, il numero di oggetti e gli oggetti*/
+			fscanf(fp, "%d",&tmp);
+			while(!feof(fp)){
+				fscanf(fp,"%s ", tmpstr);
+				stanza=*(stanze+tmp);
+				p=objfind(stanza->oggetti, tmpstr);
+				fscanf(fp,"%d",&numobj);
+				for(i=0;i<numobj;i++){
+					fscanf(fp,"%s ",tmpstr);
+					listaobjtmp=objappend(listaobjtmp,tmpstr);
+				}
+				p->in=listaobjtmp;
+				listaobjtmp=NULL;
+				fscanf(fp,"%d",&tmp);
+			}
+
+
+			fclose(fp);
 		}else
-		 printf("not in");
+		 printf("generastanze: impossibile aprire il file");
 	}
 	return stanze;
+}
+
+int save(stanza_t** stanze,int nstanze, char fst[], char fobj[]){
+	FILE *fpst,*fpobj;
+	stanza_t* stanza;
+	obj_t*p,*q;
+	int i, objcounter;
+
+	if(fpst=fopen(fst,"w")){
+		if(fpobj=fopen(fobj,"w")){
+			for(i=0;i<nstanze;i++){
+				stanza=*(stanze+i);
+				//fprintf(fpst,"%d\t%d\t%d\t%d\t%d\t%d\n",stanza->nord->id,stanza->sud->id,stanza->est->id,stanza->ovest->id,stanza->su->id,stanza->giu->id);
+				/*DA SISTEMARE: ci sono stanze senza oggetti e senza porte su alcune pareti (servono if, core dump)*/
+				objcounter=0;
+				for(p=stanza->oggetti;p;p=p->next)
+					objcounter++;
+				fprintf(fpobj,"%d ",objcounter);
+				for(p=stanza->oggetti;p;p=p->next)
+					fprintf(fpobj,"%s ",p->nome);
+				fprintf(fpobj,"\n\n");
+			}
+			for(i=0;i<nstanze;i++){
+				stanza=*(stanze+i);
+				for(p=stanza->oggetti;p;p=p->next)
+					if(p->in){
+						objcounter=0;
+						fprintf(fpobj,"%d %s ",i,p->nome);
+						for(q=p->in;q;q=q->next)
+							objcounter++;
+						fprintf(fpobj,"%d ", objcounter);
+						for(q=p->in;q;q=q->next)
+							fprintf(fpobj, "%s ", q->nome);
+						fprintf(fpobj, "\n");
+					}
+			}
+
+			fclose(fpobj);
+		}else return 0;
+		fclose(fpst);
+	}else return 0;
+	return 1;
 }
 
 obj_t * objappend(obj_t*h,char obj[]){
@@ -207,10 +275,25 @@ obj_t * objappend(obj_t*h,char obj[]){
 	return h;
 
 }
+
+obj_t * objfind(obj_t*h,char obj[]){
+	obj_t*p;
+	for(p=h;h;p=p->next)
+		if(!strcmp(obj,p->nome))
+			return p;
+	return NULL;
+}
+
 void objprint(obj_t*h){
-	obj_t* p;
+	obj_t* p, *q;
 	for(p=h;p;p=p->next){
 		printf("%s, ",p->nome);
+		if(p->in){
+			printf("(contiene: ");
+			for(q=p->in;q;q=q->next)
+				printf("%s ",q->nome);
+			printf("), ");
+		}
 	}
 	printf("\n");
 	return;

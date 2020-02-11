@@ -1,0 +1,19 @@
+3 coltello candela giacomo
+2 giovanni giuseppe
+1 torcia
+0
+1 ziogiovanni
+2 baule 3 coltello candela 
+
+
+
+/*
+->stanze
+[0]3 coltello candela giacomo
+[1]2 giovanni giuseppe
+[2]1 torcia
+[3]0
+[4]1 ziogiovanni
+->bauli
+[stanza]2 [oggetto]baule [num elem]3 [elem]coltello candela
+*/
