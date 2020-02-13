@@ -10,10 +10,11 @@
 
 #define FSTANZE "stanze.txt"
 #define DEFAULTDIR "./default/"
-#define FOBJ "obj.txt"
-#define NSTANZE 5
-#define LENOBJ 15
+#define FOBJ "stanzeobj.txt"
+#define NSTANZE 22
+#define LENOBJ 30
 #define CONTENITORE "inside"
+
 
 
 
@@ -42,9 +43,11 @@ typedef struct _stanza{
 stanza_t** generastanze(int, char [], char[]);
 void stampastanze(stanza_t**,int);
 void stampaoggetti(obj_t *);
-obj_t * appendobj(obj_t *, char [], obj_t *);
+obj_t * appendobj(obj_t *, char [], obj_t **);
 obj_t * riempicontenitore(obj_t *, FILE *);
-void delnewline(char []);
+void delcarret(char []);
+void delspace(char []);
+
 
 
 
@@ -68,7 +71,7 @@ int main (int argc, char*argv[]){
 
 	stanze=generastanze(NSTANZE,filestanze,fileobj);
 
-	for(i=1;i<=NSTANZE;i++)
+	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);
 	return 0;
 }
@@ -137,7 +140,7 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	stanza_t * *stanze, *n, *stanza; /*giusto che siano 2 asterischi, perchè è una malloc di indirizzi*/
 	int tmp, i, j;
 	char nomeobj[LENOBJ];
-	obj_t * obj;
+	obj_t * obj=NULL;
 
 	if(stanze=malloc(numstanze*sizeof(stanza_t*))){
 		for(i=0;i<numstanze;i++)
@@ -206,30 +209,39 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 		/*AGGIUNGO GLI OGGETTI*/
 
 		if(fp=fopen(fobj, "r")){
-			for(i=0; i<numstanze; i++){
+				for(i=0; i<numstanze; i++){
 				stanza=*(stanze+i);
+				stanza->oggetti=NULL;
 				fscanf(fp, "%d", &tmp);
 				for(j=0; j<tmp; j++){
 					fgets(nomeobj, LENOBJ, fp);
-					delnewline(nomeobj);		/* la fgets prende anche il carattere newline, che va eliminato */
+	/*				for(int k=0; nomeobj[k]!='\0'; k++)
+						printf("%d ", nomeobj[k]);
+					printf("\n");*/
+					delcarret(nomeobj);						/* la fgets prende anche il carattere ritorno a capo, che va eliminato */
+					delspace(nomeobj);
 
-					if(!strcmp(nomeobj, CONTENITORE))		/* la stringa CONTENITORE indica che gli oggetti */
+					if(!strcmp(nomeobj, CONTENITORE))							/* la stringa CONTENITORE indica che gli oggetti  */
 						obj=riempicontenitore(obj, fp);					/* che seguono sono contenuti nel precedente */
 
 					else
-						stanza->oggetti=appendobj(stanza->oggetti, nomeobj, obj);
+						stanza->oggetti=appendobj(stanza->oggetti, nomeobj, &obj);
+
 				}
 			}
 			fclose(fp);
-		}
+		}else
+			printf("errore accesso a file %s\n", fobj);
 
 
 	}
+
+	printf("\n\n");
 	return stanze;
 
 }
 
-obj_t * appendobj(obj_t * h, char nomeobj[], obj_t * obj)
+obj_t * appendobj(obj_t * h, char nomeobj[], obj_t ** obj)
 {
 	obj_t * n, * p;
 
@@ -238,7 +250,7 @@ obj_t * appendobj(obj_t * h, char nomeobj[], obj_t * obj)
 		n->next=NULL;
 		n->in=NULL;
 		n->open=1;
-		obj=n;
+		*obj=n;
 		if(h){
 			for(p=h; p->next; p=p->next)
 				;
@@ -259,25 +271,39 @@ obj_t * riempicontenitore(obj_t * h, FILE * fp)
 
 	fscanf(fp, "%d", &n);
 	fgets(nomeobj, LENOBJ, fp);
-	delnewline(nomeobj);
-	h->in=appendobj(h->in, nomeobj, obj);
+	delcarret(nomeobj);
+	delspace(nomeobj);
+	h->in=appendobj(h->in, nomeobj, &obj);
 
 	if(n>1)
-		for(i=0; i<n; i++){
+		for(i=1; i<n; i++){
 			fgets(nomeobj, LENOBJ, fp);
-			delnewline(nomeobj);
-			h->in=appendobj(h->in, nomeobj, obj);
+			delcarret(nomeobj);
+			delspace(nomeobj);
+			h->in=appendobj(h->in, nomeobj, &obj);
 		}
 
 	return h;
 
 }
 
-void delnewline(char s[]){
+void delcarret(char s[]){
 	int i;
 
-	for(i=0; s[i]!='\n' && s[i]!='\0'; i++)
+	for(i=0; s[i]!='\r' && s[i]!='\0'; i++)
 		;
 	s[i]='\0';
+
+}
+
+
+
+void delspace(char s[]){
+	int i;
+
+	if(s[0]==' '){
+		for(i=0; s[i]!='\0'; i++)
+			s[i]=s[i+1];
+	}
 
 }
