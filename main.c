@@ -7,10 +7,14 @@
 #define VIVO 1
 #define MORTO 0
 #define QUIT 0
+#define NOLINK -1
 
 #define FSTANZE "stanze.txt"
 #define DEFAULTDIR "./default/"
 #define FOBJ "stanzeobj.txt"
+#define SAVEDIR "./save/"
+#define SAVESTANZE "savestanze.txt"
+#define SAVEOBJ "saveobj.txt"
 #define NSTANZE 22
 #define LENOBJ 30
 #define CONTENITORE "inside"
@@ -41,11 +45,14 @@ typedef struct _stanza{
 
 
 stanza_t** generastanze(int, char [], char[]);
+void salva(int, stanza_t **, char [], char []);
+void salvaoggetti(obj_t *, FILE *);
 void stampastanze(stanza_t**,int);
 void stampaoggetti(obj_t *);
 obj_t * appendobj(obj_t *, char [], obj_t **);
 obj_t * riempicontenitore(obj_t *, FILE *);
 void delcarret(char []);
+void delnewline(char []);
 void delspace(char []);
 
 
@@ -57,19 +64,40 @@ void delspace(char []);
 int main (int argc, char*argv[]){
 	stanza_t**stanze;
 	int i;
-	char carica;
-	char filestanze[50],fileobj[50];
+	char carica/*, save*/;
+	char filestanze[50],fileobj[50]/*, salvastanze[50], salvaobj[50]*/;
+
 	printf("vuoi caricare il salvataggio? (y/n)  ");
 	scanf("%c",&carica);
 	printf("\n");
-	if(carica=='n'){
+	if(carica=='y'){
+		strcpy(filestanze,SAVEDIR);
+		strcpy(fileobj,SAVEDIR);
+		strcat(filestanze,SAVESTANZE);
+		strcat(fileobj,SAVEOBJ);
+	}else{
 		strcpy(filestanze,DEFAULTDIR);
 		strcpy(fileobj,DEFAULTDIR);
+		strcat(filestanze,FSTANZE);
+		strcat(fileobj,FOBJ);
 	}
-	strcat(filestanze,FSTANZE);
-	strcat(fileobj,FOBJ);
+
 
 	stanze=generastanze(NSTANZE,filestanze,fileobj);
+
+
+/*	printf("vuoi salvare? (y/n)   ");
+	scanf("%c",&save);
+	printf("\n");
+	if(save=='y'){
+
+	}
+	strcpy(salvastanze,SAVEDIR);
+	strcpy(salvaobj,SAVEDIR);
+	strcat(salvastanze,SAVESTANZE);
+	strcat(salvaobj,SAVEOBJ);
+
+	salva(NSTANZE, stanze, salvastanze, salvaobj);*/
 
 	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);
@@ -218,7 +246,8 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	/*				for(int k=0; nomeobj[k]!='\0'; k++)
 						printf("%d ", nomeobj[k]);
 					printf("\n");*/
-					delcarret(nomeobj);						/* la fgets prende anche il carattere ritorno a capo, che va eliminato */
+					delcarret(nomeobj);						/* nel file viene inserito a fine riga il carattere carriage return	*/
+					delnewline(nomeobj);					/* la fgets prende anche il carattere new line, che va eliminato */
 					delspace(nomeobj);
 
 					if(!strcmp(nomeobj, CONTENITORE))							/* la stringa CONTENITORE indica che gli oggetti  */
@@ -236,7 +265,6 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 
 	}
 
-	printf("\n\n");
 	return stanze;
 
 }
@@ -272,6 +300,7 @@ obj_t * riempicontenitore(obj_t * h, FILE * fp)
 	fscanf(fp, "%d", &n);
 	fgets(nomeobj, LENOBJ, fp);
 	delcarret(nomeobj);
+	delnewline(nomeobj);
 	delspace(nomeobj);
 	h->in=appendobj(h->in, nomeobj, &obj);
 
@@ -279,6 +308,7 @@ obj_t * riempicontenitore(obj_t * h, FILE * fp)
 		for(i=1; i<n; i++){
 			fgets(nomeobj, LENOBJ, fp);
 			delcarret(nomeobj);
+			delnewline(nomeobj);
 			delspace(nomeobj);
 			h->in=appendobj(h->in, nomeobj, &obj);
 		}
@@ -287,10 +317,127 @@ obj_t * riempicontenitore(obj_t * h, FILE * fp)
 
 }
 
+
+void salva(int numstanze, stanza_t ** stanze, char savestanze[], char saveobj[])
+{
+	int i;
+	stanza_t * stanza;
+	FILE * fp;
+
+	/* SALVATAGGIO STANZE*/
+
+	if(fp=fopen(savestanze, "w")){
+		for(i=0; i<numstanze; i++){
+			stanza=*(stanze+i);
+			if(stanza->nord)
+				fprintf(fp, "%d ", stanza->nord->id);
+			else
+				fprintf(fp, "%d ", NOLINK);
+
+			if(stanza->sud)
+				fprintf(fp, "%d ", stanza->sud->id);
+			else
+				fprintf(fp, "%d ", NOLINK);
+
+			if(stanza->est)
+				fprintf(fp, "%d ", stanza->est->id);
+			else
+				fprintf(fp, "%d ", NOLINK);
+
+			if(stanza->ovest)
+				fprintf(fp, "%d ", stanza->ovest->id);
+			else
+				fprintf(fp, "%d ", NOLINK);
+
+			if(stanza->su)
+				fprintf(fp, "%d ", stanza->su->id);
+			else
+				fprintf(fp, "%d ", NOLINK);
+
+			if(stanza->giu)
+				fprintf(fp, "%d ", stanza->giu->id);
+			else
+				fprintf(fp, "%d ", NOLINK);
+
+			fprintf(fp, "  ");
+			fprintf(fp, "%d ", stanza->nordopen);
+			fprintf(fp, "%d ", stanza->sudopen);
+			fprintf(fp, "%d ", stanza->estopen);
+			fprintf(fp, "%d ", stanza->ovestopen);
+			fprintf(fp, "%d ", stanza->suopen);
+			fprintf(fp, "%d ", stanza->giuopen);
+			fprintf(fp, "\n");
+
+		}
+		fclose(fp);
+	}else
+		printf("errore accesso al file %s\n", savestanze);
+
+	/*SALVATAGGIO OGGETTI*/
+
+	if(fp=fopen(saveobj, "w")){
+		for(i=0; i<numstanze; i++){
+			stanza=*(stanze+i);
+			salvaoggetti(stanza->oggetti, fp);
+		}
+		fclose(fp);
+	}else
+		printf("errore accesso al file %s\n", saveobj);
+
+}
+
+
+void salvaoggetti(obj_t * h, FILE * fp)
+{
+	int nobj;
+	obj_t * p;
+
+	nobj=0;
+	if(h){
+		for(p=h; p; p=p->next){
+			nobj++;
+			if(p->in)
+				nobj++;
+		}
+		fprintf(fp, "%d ", nobj);
+		fprintf(fp, "%s\n", h->nome);
+		if(h->in){
+			fprintf(fp, "%s\n", CONTENITORE);
+			salvaoggetti(h->in, fp);
+		}
+		if(nobj>1)
+			for(p=h->next; p; p=p->next){
+				fprintf(fp, "%s\n", p->nome);
+				if(p->in){
+					fprintf(fp, "%s\n", CONTENITORE);
+					salvaoggetti(p->in, fp);
+				}
+			}
+
+	}else
+		fprintf(fp, "%d\n", nobj);
+}
+
+
+
+
+
+
+
+
 void delcarret(char s[]){
 	int i;
 
 	for(i=0; s[i]!='\r' && s[i]!='\0'; i++)
+		;
+	s[i]='\0';
+
+}
+
+void delnewline(char s[]){
+	int i;
+
+	for(i=0; s[i]!='\n' && s[i]!='\0'; i++)
 		;
 	s[i]='\0';
 
