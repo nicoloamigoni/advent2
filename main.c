@@ -48,14 +48,13 @@ stanza_t** generastanze(int, char [], char[]);
 void salva(int, stanza_t **, char [], char []);
 void salvaoggetti(obj_t *, FILE *);
 void stampastanze(stanza_t**,int);
-void objprint(obj_t*h);/*stampa una lista di oggetti*/
 void stampaoggetti(obj_t *);
 obj_t * appendobj(obj_t *, char [], obj_t **);
 obj_t * riempicontenitore(obj_t *, FILE *);
 void delcarret(char []);
 void delnewline(char []);
-obj_t*objfind(obj_t*,char[]);/*trova un oggetto in una lista e restituisce l'indirizzo*/
-int save(stanza_t**,int, char[], char[]);
+void delspace(char []);
+
 
 
 
@@ -79,12 +78,10 @@ int main (int argc, char*argv[]){
 	}else{
 		strcpy(filestanze,DEFAULTDIR);
 		strcpy(fileobj,DEFAULTDIR);
-	} else{
-		strcpy(filestanze,SAVEDIR);
-		strcpy(fileobj,SAVEDIR);
+		strcat(filestanze,FSTANZE);
+		strcat(fileobj,FOBJ);
 	}
-	strcat(filestanze,FSTANZE);
-	strcat(fileobj,FOBJSTANZE);
+
 
 	stanze=generastanze(NSTANZE,filestanze,fileobj);
 
@@ -104,14 +101,6 @@ int main (int argc, char*argv[]){
 
 	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);
-	strcpy(fstsave,SAVEDIR);
-	strcpy(fobjsave,SAVEDIR);
-	strcat(fstsave,FSTANZE);
-	strcat(fobjsave,FOBJSTANZE);
-
-
-	if(save(stanze, NSTANZE, fstsave, fobjsave))
-		printf("\nsalvataggio avvenuto con successo \n");
 	return 0;
 }
 
@@ -246,6 +235,7 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 		}
 
 		/*AGGIUNGO GLI OGGETTI*/
+
 		if(fp=fopen(fobj, "r")){
 				for(i=0; i<numstanze; i++){
 				stanza=*(stanze+i);
@@ -276,36 +266,8 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	}
 
 	return stanze;
-}
-
-
-obj_t * objappend(obj_t*h,char obj[]){
-	obj_t*p,*n;
-	if(n=malloc(sizeof(obj_t))){
-		if(h){
-			for(p=h;p->next;p=p->next)
-				;
-			p->next=n;
-		} else
-			h=n;
-		strcpy(n->nome,obj);
-		n->next=NULL;
-		n->in=NULL;
-
-	}
-	return h;
 
 }
-
-obj_t * objfind(obj_t*h,char obj[]){
-	obj_t*p;
-	for(p=h;h;p=p->next)
-		if(!strcmp(obj,p->nome))
-			return p;
-	return NULL;
-}
-
-
 
 obj_t * appendobj(obj_t * h, char nomeobj[], obj_t ** obj)
 {
