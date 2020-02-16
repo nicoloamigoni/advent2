@@ -278,47 +278,6 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	return stanze;
 }
 
-int save(stanza_t** stanze,int nstanze, char fst[], char fobj[]){
-	FILE *fpst,*fpobj;
-	stanza_t* stanza;
-	obj_t*p,*q;
-	int i, objcounter;
-
-	if(fpst=fopen(fst,"w")){
-		if(fpobj=fopen(fobj,"w")){
-			for(i=0;i<nstanze;i++){
-				stanza=*(stanze+i);
-				//fprintf(fpst,"%d\t%d\t%d\t%d\t%d\t%d\n",stanza->nord->id,stanza->sud->id,stanza->est->id,stanza->ovest->id,stanza->su->id,stanza->giu->id);
-				/*DA SISTEMARE: ci sono stanze senza oggetti e senza porte su alcune pareti (servono if, core dump)*/
-				objcounter=0;
-				for(p=stanza->oggetti;p;p=p->next)
-					objcounter++;
-				fprintf(fpobj,"%d ",objcounter);
-				for(p=stanza->oggetti;p;p=p->next)
-					fprintf(fpobj,"%s ",p->nome);
-				fprintf(fpobj,"\n\n");
-			}
-			for(i=0;i<nstanze;i++){
-				stanza=*(stanze+i);
-				for(p=stanza->oggetti;p;p=p->next)
-					if(p->in){
-						objcounter=0;
-						fprintf(fpobj,"%d %s ",i,p->nome);
-						for(q=p->in;q;q=q->next)
-							objcounter++;
-						fprintf(fpobj,"%d ", objcounter);
-						for(q=p->in;q;q=q->next)
-							fprintf(fpobj, "%s ", q->nome);
-						fprintf(fpobj, "\n");
-					}
-			}
-
-			fclose(fpobj);
-		}else return 0;
-		fclose(fpst);
-	}else return 0;
-	return 1;
-}
 
 obj_t * objappend(obj_t*h,char obj[]){
 	obj_t*p,*n;
