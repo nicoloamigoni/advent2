@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 3 coltello candela giacomo
 2 giovanni baule
 1 torcia
@@ -12,14 +13,48 @@
 armatura
 3
 torcia
+=======
+1 armatura
+3 torcia
+>>>>>>> 90fe353fc8f99f80d73951527004ea576bb96500
 libreria
 inside
-3
-libro verde
+3 libro verde
 libro giallo
 libro rosso
+<<<<<<< HEAD
 1
 arpa
 1
 pozione
 >>>>>>> 2a04dd5b726206aa5dd257bc6f9e60b3d2b978b2
+=======
+1 arpa
+1 pozione
+0
+1 chiave baule
+0
+1 chiave di ferro
+0
+1 chiave di bronzo
+0
+0
+1 tesoro
+1 drago
+3 chiave di ottone
+scaffale
+inside
+1 coltello
+3 candela
+scrivania
+inside
+1 pergamena
+2 armadio
+inside
+1 lente d'ingrandimento
+0
+1 baule
+0
+1 chiave dorata
+0
+>>>>>>> 90fe353fc8f99f80d73951527004ea576bb96500

@@ -1,0 +1,35 @@
+1 armatura
+3 torcia
+libreria
+inside
+3 libro verde
+libro giallo
+libro rosso
+1 arpa
+1 pozione
+0
+1 chiave baule
+0
+1 chiave di ferro
+0
+1 chiave di bronzo
+0
+0
+1 tesoro
+1 drago
+3 chiave di ottone
+scaffale
+inside
+1 coltello
+3 candela
+scrivania
+inside
+1 pergamena
+2 armadio
+inside
+1 lente d'ingrandimento
+0
+1 baule
+0
+1 chiave dorata
+0
