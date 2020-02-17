@@ -90,7 +90,6 @@ int main (int argc, char*argv[]){
 		stampastanze(stanze,i);*/
 	printf("All'inizio, il player è in %d\n",player->id);
 	interpretacomando();
-	printf("arrivato qui\n");
 	printf("Il player è nella stanza %d\n",player->id);
 	return 0;
 }
@@ -426,7 +425,7 @@ void salvaoggetti(obj_t * h, FILE * fp){
 void interpretacomando(){
 	char comando[LENCMD], azione[LENACT];
 	int i, act, check;
-
+	fgets(comando,LENCMD,stdin);
 	do{
 		check=1;
 		fgets(comando,LENCMD,stdin);
@@ -442,8 +441,6 @@ void interpretacomando(){
 			check=0;
 
 	}while(!check);
-	printf("|%s| |%s|\n", comando, azione);
-	printf("interpretacomando: uscito dal while\n");
 	return;
 }
 
@@ -477,55 +474,78 @@ int vai(char comando[]){
 		if(player->nord)
 			if(player->nordopen)
 				player=player->nord;
-			else
+			else{
 				printf("La porta è chiusa\n");
-		else
+				return 0;
+			}
+		else{
 			printf("Non ci puoi andare\n");
+			return 0;
+		}
 	}else if(!strcmp(&comando[i],"sud")){
 		if(player->sud)
 			if(player->sudopen)
 				player=player->sud;
-			else
+			else{
 				printf("La porta è chiusa\n");
-		else
+				return 0;
+			}
+		else{
 			printf("Non ci puoi andare\n");
+			return 0;
+		}
 	}else if(!strcmp(&comando[i],"est")){
 		if(player->est)
 			if(player->estopen)
 				player=player->est;
-			else
+			else{
 				printf("La porta è chiusa\n");
-		else
+				return 0;
+			}
+		else{
 			printf("Non ci puoi andare\n");
+			return 0;
+		}
 	}else if(!strcmp(&comando[i],"ovest")){
 		if(player->ovest)
 			if(player->ovestopen)
 				player=player->ovest;
-			else
+			else{
 				printf("La porta è chiusa\n");
-		else
+				return 0;
+			}
+		else{
 			printf("Non ci puoi andare\n");
+			return 0;
+		}
 	}else if(!strcmp(&comando[i],"su")){
 		if(player->su)
 			if(player->suopen)
 				player=player->su;
-			else
+			else{
 				printf("La porta è chiusa\n");
-		else
+				return 0;
+			}
+		else{
 			printf("Non ci puoi andare\n");
+			return 0;
+		}
 	}else if(!strcmp(&comando[i],"giu")){
 		if(player->giu)
 			if(player->giuopen)
 				player=player->giu;
-			else
+			else{
 				printf("La porta è chiusa\n");
-		else
+				return 0;
+			}
+		else{
 			printf("Non ci puoi andare\n");
+			return 0;
+		}
 	}else{
 		printf("Direzione non trovata\n");
 		return 0;
 	}
-	printf("|%d|\n",player->id);
 	return 1;
 }
 
