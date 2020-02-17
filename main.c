@@ -15,9 +15,13 @@
 #define SAVEDIR "./save/"
 #define SAVESTANZE "savestanze.txt"
 #define SAVEOBJ "saveobj.txt"
+#define FACT "./default/act.txt"
 #define NSTANZE 22
 #define LENOBJ 30
+#define LENCMD 100
+#define LENACT 20
 #define CONTENITORE "inside"
+
 
 
 
@@ -41,8 +45,7 @@ typedef struct _stanza{
 	obj_t * oggetti;
 }stanza_t;
 
-
-
+void inizio(stanza_t **);
 
 stanza_t** generastanze(int, char [], char[]);
 void salva(int, stanza_t **, char [], char []);
@@ -55,36 +58,21 @@ void delcarret(char []);
 void delnewline(char []);
 void delspace(char []);
 
+void interpretacomando();
+int findact(char []);
+int vai(char []);
 
 
 
 
 
+
+stanza_t* player=NULL;
 
 int main (int argc, char*argv[]){
-	stanza_t**stanze;
 	int i;
-	char carica/*, save*/;
-	char filestanze[50],fileobj[50]/*, salvastanze[50], salvaobj[50]*/;
-
-	printf("vuoi caricare il salvataggio? (y/n)  ");
-	scanf("%c",&carica);
-	printf("\n");
-	if(carica=='y'){
-		strcpy(filestanze,SAVEDIR);
-		strcpy(fileobj,SAVEDIR);
-		strcat(filestanze,SAVESTANZE);
-		strcat(fileobj,SAVEOBJ);
-	}else{
-		strcpy(filestanze,DEFAULTDIR);
-		strcpy(fileobj,DEFAULTDIR);
-		strcat(filestanze,FSTANZE);
-		strcat(fileobj,FOBJ);
-	}
-
-
-	stanze=generastanze(NSTANZE,filestanze,fileobj);
-
+	stanza_t**stanze=NULL;
+	inizio(stanze);
 
 /*	printf("vuoi salvare? (y/n)   ");
 	scanf("%c",&save);
@@ -99,8 +87,11 @@ int main (int argc, char*argv[]){
 
 	salva(NSTANZE, stanze, salvastanze, salvaobj);*/
 
-	for(i=0;i<NSTANZE;i++)
-		stampastanze(stanze,i);
+/*	for(i=0;i<NSTANZE;i++)
+		stampastanze(stanze,i);*/
+	interpretacomando();
+	printf("arrivato qui\n");
+	printf("Il player è nella stanza %d\n",player->id);
 	return 0;
 }
 
@@ -123,6 +114,31 @@ int main(int argc, char*argv[]){
 	}
 	return 0;
 }*/
+
+void inizio(stanza_t **stanze){
+	char carica;
+	char filestanze[50],fileobj[50];
+
+	printf("vuoi caricare il salvataggio? (y/n)  ");
+	scanf("%c",&carica);
+	printf("\n");
+	if(carica=='y'){
+		strcpy(filestanze,SAVEDIR);
+		strcpy(fileobj,SAVEDIR);
+		strcat(filestanze,SAVESTANZE);
+		strcat(fileobj,SAVEOBJ);
+	}else{
+		strcpy(filestanze,DEFAULTDIR);
+		strcpy(fileobj,DEFAULTDIR);
+		strcat(filestanze,FSTANZE);
+		strcat(fileobj,FOBJ);
+	}
+
+
+	stanze=generastanze(NSTANZE,filestanze,fileobj);
+
+	player=*(stanze); /*partiamo dalla prima stanza*/
+}
 
 void stampastanze(stanza_t** add,int n){
 	stanza_t * stanza;
@@ -418,12 +434,94 @@ void salvaoggetti(obj_t * h, FILE * fp)
 		fprintf(fp, "%d\n", nobj);
 }
 
+void interpretacomando()
+{
+	char comando[LENCMD], azione[LENACT];
+	int i, act, check;
 
+	do{
+		check=1;
+		gets(comando);
+		delnewline(comando);
+		for(i=0; comando[i] != ' '; i++)
+			azione[i]=comando[i];
+		azione[i]='\0';
+		act = findact(azione);
 
+		if(act==0)
+			check=vai(&comando[i]);
+		else
+			check=0;
 
+	}while(!check);
 
+	return;
+}
 
+int findact(char azione[]){
+	FILE*fp;
+	int act;
+	char verbo[LENACT];
 
+	if(fp=fopen(FACT, "r")){
+		fscanf(fp,"%d ",&act);
+		while(!feof(fp)){
+			fscanf(fp,"%s",verbo);
+			if(!strcmp(verbo, azione))
+				return act;
+			fscanf(fp,"%d ",&act);
+		}
+		printf("Comando non trovato\n");
+	}else
+		printf("findact: errore acesso al file %s\n", FACT);
+	return -1;
+}
+
+int vai(char comando[]){
+	int i;
+	i=0;
+	do
+		i++;
+	while(comando[i]==' ');
+	if(!strcmp(&comando[i],"nord")){
+		if(player->nord)
+			if(player->nordopen)
+				player=player->nord;
+			else
+				printf("La porta è chiusa\n");
+		else
+			printf("Non ci puoi andare\n");
+	}else if(!strcmp(&comando[i],"sud")){
+		if(player->sudopen)
+			player=player->sud;
+		else
+			printf("La porta è chiusa\n");
+	}else if(!strcmp(&comando[i],"est")){
+		if(player->estopen)
+			player=player->est;
+		else
+			printf("La porta è chiusa\n");
+	}else if(!strcmp(&comando[i],"ovest")){
+		if(player->ovestopen)
+			player=player->ovest;
+		else
+			printf("La porta è chiusa\n");
+	}else if(!strcmp(&comando[i],"su")){
+		if(player->suopen)
+			player=player->su;
+		else
+			printf("La porta è chiusa\n");
+	}else if(!strcmp(&comando[i],"giu")){
+		if(player->giuopen)
+			player=player->giu;
+		else
+			printf("La porta è chiusa\n");
+	}else{
+		printf("Direzione non trovata\n");
+		return 0;
+	}
+	return 1;
+}
 
 void delcarret(char s[]){
 	int i;
