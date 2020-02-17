@@ -492,30 +492,45 @@ int vai(char comando[]){
 		else
 			printf("Non ci puoi andare\n");
 	}else if(!strcmp(&comando[i],"sud")){
-		if(player->sudopen)
-			player=player->sud;
+		if(player->sud)
+			if(player->sudopen)
+				player=player->sud;
+			else
+				printf("La porta è chiusa\n");
 		else
-			printf("La porta è chiusa\n");
+			printf("Non ci puoi andare\n");
 	}else if(!strcmp(&comando[i],"est")){
-		if(player->estopen)
-			player=player->est;
+		if(player->est)
+			if(player->estopen)
+				player=player->est;
+			else
+				printf("La porta è chiusa\n");
 		else
-			printf("La porta è chiusa\n");
+			printf("Non ci puoi andare\n");
 	}else if(!strcmp(&comando[i],"ovest")){
-		if(player->ovestopen)
-			player=player->ovest;
+		if(player->ovest)
+			if(player->ovestopen)
+				player=player->ovest;
+			else
+				printf("La porta è chiusa\n");
 		else
-			printf("La porta è chiusa\n");
+			printf("Non ci puoi andare\n");
 	}else if(!strcmp(&comando[i],"su")){
-		if(player->suopen)
-			player=player->su;
+		if(player->su)
+			if(player->suopen)
+				player=player->su;
+			else
+				printf("La porta è chiusa\n");
 		else
-			printf("La porta è chiusa\n");
+			printf("Non ci puoi andare\n");
 	}else if(!strcmp(&comando[i],"giu")){
-		if(player->giuopen)
-			player=player->giu;
+		if(player->giu)
+			if(player->giuopen)
+				player=player->giu;
+			else
+				printf("La porta è chiusa\n");
 		else
-			printf("La porta è chiusa\n");
+			printf("Non ci puoi andare\n");
 	}else{
 		printf("Direzione non trovata\n");
 		return 0;
