@@ -423,8 +423,7 @@ void salvaoggetti(obj_t * h, FILE * fp){
 		fprintf(fp, "%d\n", nobj);
 }
 
-void interpretacomando()
-{
+void interpretacomando(){
 	char comando[LENCMD], azione[LENACT];
 	int i, act, check;
 
@@ -432,7 +431,7 @@ void interpretacomando()
 		check=1;
 		fgets(comando,LENCMD,stdin);
 		delnewline(comando);
-		for(i=0; comando[i] != ' '; i++)
+		for(i=0; comando[i] != ' '&&i<LENACT; i++)
 			azione[i]=comando[i];
 		azione[i]='\0';
 		act = findact(azione);
@@ -443,6 +442,7 @@ void interpretacomando()
 			check=0;
 
 	}while(!check);
+	printf("|%s| |%s|\n", comando, azione);
 	printf("interpretacomando: uscito dal while\n");
 	return;
 }
