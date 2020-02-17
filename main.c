@@ -86,9 +86,9 @@ int main (int argc, char*argv[]){
 	strcat(salvaobj,SAVEOBJ);
 
 	salva(NSTANZE, stanze, salvastanze, salvaobj);*/
-
 /*	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);*/
+	printf("All'inizio, il player è in %d\n",player->id);
 	interpretacomando();
 	printf("arrivato qui\n");
 	printf("Il player è nella stanza %d\n",player->id);
@@ -163,9 +163,7 @@ void stampastanze(stanza_t** add,int n){
 	}
 	printf("-------------\n\n");
 }
-
-void stampaoggetti(obj_t * h)
-{
+void stampaoggetti(obj_t * h){
 	obj_t * p;
 	for(p=h; p; p=p->next){
 		printf("%s ", p->nome);
@@ -177,7 +175,6 @@ void stampaoggetti(obj_t * h)
 	}
 
 }
-
 
 stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 	FILE * fp;
@@ -285,8 +282,7 @@ stanza_t** generastanze(int numstanze, char fst[],char fobj[]){
 
 }
 
-obj_t * appendobj(obj_t * h, char nomeobj[], obj_t ** obj)
-{
+obj_t * appendobj(obj_t * h, char nomeobj[], obj_t ** obj){
 	obj_t * n, * p;
 
 	if(n=malloc(sizeof(obj_t))){
@@ -306,9 +302,7 @@ obj_t * appendobj(obj_t * h, char nomeobj[], obj_t ** obj)
 
 	return h;
 }
-
-obj_t * riempicontenitore(obj_t * h, FILE * fp)
-{
+obj_t * riempicontenitore(obj_t * h, FILE * fp){
 	int n, i;
 	char nomeobj[LENOBJ];
 	obj_t * obj=NULL;
@@ -333,9 +327,7 @@ obj_t * riempicontenitore(obj_t * h, FILE * fp)
 
 }
 
-
-void salva(int numstanze, stanza_t ** stanze, char savestanze[], char saveobj[])
-{
+void salva(int numstanze, stanza_t ** stanze, char savestanze[], char saveobj[]){
 	int i;
 	stanza_t * stanza;
 	FILE * fp;
@@ -401,10 +393,7 @@ void salva(int numstanze, stanza_t ** stanze, char savestanze[], char saveobj[])
 		printf("errore accesso al file %s\n", saveobj);
 
 }
-
-
-void salvaoggetti(obj_t * h, FILE * fp)
-{
+void salvaoggetti(obj_t * h, FILE * fp){
 	int nobj;
 	obj_t * p;
 
@@ -441,20 +430,20 @@ void interpretacomando()
 
 	do{
 		check=1;
-		gets(comando);
+		fgets(comando,LENCMD,stdin);
 		delnewline(comando);
 		for(i=0; comando[i] != ' '; i++)
 			azione[i]=comando[i];
 		azione[i]='\0';
 		act = findact(azione);
 
-		if(act==0)
+		if(act==0){
 			check=vai(&comando[i]);
-		else
+		}else
 			check=0;
 
 	}while(!check);
-
+	printf("interpretacomando: uscito dal while\n");
 	return;
 }
 
@@ -472,6 +461,7 @@ int findact(char azione[]){
 			fscanf(fp,"%d ",&act);
 		}
 		printf("Comando non trovato\n");
+		fclose(fp);
 	}else
 		printf("findact: errore acesso al file %s\n", FACT);
 	return -1;
@@ -535,6 +525,7 @@ int vai(char comando[]){
 		printf("Direzione non trovata\n");
 		return 0;
 	}
+	printf("|%d|\n",player->id);
 	return 1;
 }
 
