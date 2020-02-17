@@ -1,0 +1,4 @@
+0 vai
+1 prendi
+2 lascia
+3 guarda
