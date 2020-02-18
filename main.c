@@ -53,6 +53,7 @@ void salvaoggetti(obj_t *, FILE *);
 void stampastanze(stanza_t**,int);
 void stampaoggetti(obj_t *);
 obj_t * appendobj(obj_t *, char [], obj_t **);
+obj_t * extractobj(obj_t** h, char obj[]);
 obj_t * riempicontenitore(obj_t *, FILE *);
 void delcarret(char []);
 void delnewline(char []);
@@ -61,6 +62,8 @@ void delspace(char []);
 void interpretacomando();
 int findact(char []);
 int vai(char []);
+int prendi(char[]);
+int lascia(char[]);
 
 
 
@@ -68,6 +71,7 @@ int vai(char []);
 
 
 stanza_t* player=NULL;
+obj_t* inventario=NULL;
 
 int main (int argc, char*argv[]){
 	int i;
@@ -89,8 +93,18 @@ int main (int argc, char*argv[]){
 /*	for(i=0;i<NSTANZE;i++)
 		stampastanze(stanze,i);*/
 	printf("All'inizio, il player è in %d\n",player->id);
-	interpretacomando();
-	printf("Il player è nella stanza %d\n",player->id);
+	printf("L'inventario è: ");
+	stampaoggetti(inventario);
+	printf("\n");
+
+	while(1){
+		interpretacomando();
+		printf("Il player è nella stanza %d\n",player->id);
+		printf("L'inventario è: ");
+		stampaoggetti(inventario);
+		printf("\n");
+	}
+
 	return 0;
 }
 
@@ -421,29 +435,59 @@ void salvaoggetti(obj_t * h, FILE * fp){
 	}else
 		fprintf(fp, "%d\n", nobj);
 }
+obj_t* extractobj(obj_t** h, char obj[]){
+	obj_t*p, *q;
+	p=*h;
+	if(*h){
+		if(p->in){
+			q=extractobj(h,obj);
+			if(q)
+				return q;
+		} else if(!strcmp(p->nome, obj)){
+			*h=p->next;
+			p->next=NULL;
+			return p;
+		}
+		else for(;p->next;p=p->next){
+			if(p->next->in){
+				q=extractobj(&(p->next),obj);
+				if(q)
+					return q;
+			}else if(!strcmp(p->next->nome,obj)){
+				q=p->next;
+				p->next=q->next;
+				q->next=NULL;
+				return q;
+			}
+
+		}
+	}
+	return NULL;
+}
 
 void interpretacomando(){
 	char comando[LENCMD], azione[LENACT];
 	int i, act, check;
-	fgets(comando,LENCMD,stdin);
+	//fgets(comando,LENCMD,stdin);
 	do{
 		check=1;
 		fgets(comando,LENCMD,stdin);
 		delnewline(comando);
-		for(i=0; comando[i] != ' '&&i<LENACT; i++)
+		for(i=0; comando[i] != ' '&&i<LENACT&&comando[i]!='\0'; i++)
 			azione[i]=comando[i];
 		azione[i]='\0';
 		act = findact(azione);
 
 		if(act==0){
 			check=vai(&comando[i]);
+		}else if(act==1){
+			check=prendi(&comando[i]);
 		}else
 			check=0;
 
 	}while(!check);
 	return;
 }
-
 int findact(char azione[]){
 	FILE*fp;
 	int act;
@@ -548,6 +592,31 @@ int vai(char comando[]){
 	}
 	return 1;
 }
+int prendi(char comando[]){
+	int i;
+	obj_t*p,*q;
+	i=0;
+	do
+		i++;
+	while(comando[i]==' '&&comando[i]!='\0');
+	if(comando[i]=='\0'){
+		printf("Specifica l'oggetto da prendere");
+		return 0;
+	}
+
+	if(p=extractobj(&(player->oggetti),&comando[i])){
+		if(inventario){
+			for(q=inventario;q->next;q=q->next)
+				;
+			q->next=p;
+		}else
+			inventario=p;
+		printf("%s aggiunto al tuo inventario\n", p->nome);
+		return 1;
+	}
+	printf("Oggetto non trovato: %s\n",&comando[i]);
+	return 0;
+}
 
 void delcarret(char s[]){
 	int i;
@@ -566,8 +635,6 @@ void delnewline(char s[]){
 	s[i]='\0';
 
 }
-
-
 
 void delspace(char s[]){
 	int i;
