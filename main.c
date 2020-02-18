@@ -408,7 +408,10 @@ void salva(int numstanze, stanza_t ** stanze, char savestanze[], char saveobj[])
 		printf("errore accesso al file %s\n", saveobj);
 
 }
-void salvaoggetti(obj_t * h, FILE * fp){
+
+
+void salvaoggetti(obj_t * h, FILE * fp)
+{
 	int nobj;
 	obj_t * p;
 
@@ -437,6 +440,8 @@ void salvaoggetti(obj_t * h, FILE * fp){
 	}else
 		fprintf(fp, "%d\n", nobj);
 }
+
+
 obj_t* extractobj(obj_t** h, char obj[]){
 	obj_t*p, *q;
 	p=*h;
@@ -492,6 +497,8 @@ void interpretacomando(){
 	}while(!check);
 	return;
 }
+
+
 int findact(char azione[]){
 	FILE*fp;
 	int act;
@@ -501,8 +508,10 @@ int findact(char azione[]){
 		fscanf(fp,"%d ",&act);
 		while(!feof(fp)){
 			fscanf(fp,"%s",verbo);
-			if(!strcmp(verbo, azione))
+			if(!strcmp(verbo, azione)){
+				fclose(fp);
 				return act;
+			}
 			fscanf(fp,"%d ",&act);
 		}
 		printf("Comando non trovato\n");
@@ -511,6 +520,8 @@ int findact(char azione[]){
 		printf("findact: errore acesso al file %s\n", FACT);
 	return -1;
 }
+
+
 
 int vai(char comando[]){
 	int i;
@@ -596,6 +607,8 @@ int vai(char comando[]){
 	}
 	return 1;
 }
+
+
 int prendi(char comando[]){
 	int i;
 	obj_t*p,*q;
@@ -621,6 +634,8 @@ int prendi(char comando[]){
 	printf("Oggetto non trovato: %s\n",&comando[i]);
 	return 0;
 }
+
+
 int lascia(char comando[]){
 	int i;
 	obj_t*p,*q;
