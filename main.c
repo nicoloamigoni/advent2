@@ -96,12 +96,14 @@ int main (int argc, char*argv[]){
 	printf("L'inventario è: ");
 	stampaoggetti(inventario);
 	printf("\n");
-
+	scanf(" "); /*Risolve il problema "Comando non trovato"*/
 	while(1){
 		interpretacomando();
 		printf("Il player è nella stanza %d\n",player->id);
 		printf("L'inventario è: ");
 		stampaoggetti(inventario);
+		printf("\nNella stanza c'è: ");
+		stampaoggetti(player->oggetti);
 		printf("\n");
 	}
 
@@ -440,7 +442,7 @@ obj_t* extractobj(obj_t** h, char obj[]){
 	p=*h;
 	if(*h){
 		if(p->in){
-			q=extractobj(h,obj);
+			q=extractobj(&(p->in),obj);
 			if(q)
 				return q;
 		} else if(!strcmp(p->nome, obj)){
@@ -450,7 +452,7 @@ obj_t* extractobj(obj_t** h, char obj[]){
 		}
 		else for(;p->next;p=p->next){
 			if(p->next->in){
-				q=extractobj(&(p->next),obj);
+				q=extractobj(&(p->next->in),obj);
 				if(q)
 					return q;
 			}else if(!strcmp(p->next->nome,obj)){
@@ -468,7 +470,7 @@ obj_t* extractobj(obj_t** h, char obj[]){
 void interpretacomando(){
 	char comando[LENCMD], azione[LENACT];
 	int i, act, check;
-	//fgets(comando,LENCMD,stdin);
+	//fgets(comando,LENCMD,stdin); /*Non va bene nel ciclo..*/
 	do{
 		check=1;
 		fgets(comando,LENCMD,stdin);
@@ -478,11 +480,13 @@ void interpretacomando(){
 		azione[i]='\0';
 		act = findact(azione);
 
-		if(act==0){
+		if(act==0)
 			check=vai(&comando[i]);
-		}else if(act==1){
+		else if(act==1)
 			check=prendi(&comando[i]);
-		}else
+		else if(act==2)
+			check=lascia(&comando[i]);
+		else
 			check=0;
 
 	}while(!check);
@@ -600,7 +604,7 @@ int prendi(char comando[]){
 		i++;
 	while(comando[i]==' '&&comando[i]!='\0');
 	if(comando[i]=='\0'){
-		printf("Specifica l'oggetto da prendere");
+		printf("Specifica l'oggetto da prendere\n");
 		return 0;
 	}
 
@@ -612,6 +616,31 @@ int prendi(char comando[]){
 		}else
 			inventario=p;
 		printf("%s aggiunto al tuo inventario\n", p->nome);
+		return 1;
+	}
+	printf("Oggetto non trovato: %s\n",&comando[i]);
+	return 0;
+}
+int lascia(char comando[]){
+	int i;
+	obj_t*p,*q;
+	i=0;
+	do
+		i++;
+	while(comando[i]==' '&&comando[i]!='\0');
+	if(comando[i]=='\0'){
+		printf("Specifica l'oggetto da lasciare\n");
+		return 0;
+	}
+
+	if(p=extractobj(&(inventario),&comando[i])){
+		if(player->oggetti){
+			for(q=player->oggetti;q->next;q=q->next)
+				;
+			q->next=p;
+		}else
+			player->oggetti=p;
+		printf("%s lasciato nella stanza %d\n",p->nome,player->id);
 		return 1;
 	}
 	printf("Oggetto non trovato: %s\n",&comando[i]);
