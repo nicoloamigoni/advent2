@@ -2,3 +2,4 @@
 1 prendi
 2 lascia
 3 guarda
+4 apri
