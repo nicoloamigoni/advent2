@@ -54,7 +54,7 @@ void stampastanze(stanza_t**,int);
 void stampaoggetti(obj_t *);
 obj_t * appendobj(obj_t *, char [], obj_t **);
 obj_t * extractobj(obj_t** h, char []);
-int possiedi(char []);
+obj_t * findobj(obj_t *, char []);
 obj_t * riempicontenitore(obj_t *, FILE *);
 void delcarret(char []);
 void delnewline(char []);
@@ -475,14 +475,18 @@ obj_t* extractobj(obj_t** h, char obj[]){
 	return NULL;
 }
 
-int possiedi(char nomeobj[]){
-	obj_t * obj;
+obj_t * findobj(obj_t * h, char nomeobj[]){
+	obj_t * obj, * p;
 
-	for(obj=inventario; obj; obj=obj->next)
-		if(!strcmp(nomeobj, obj->nome))
-			return 1;
+	for(obj=h; obj; obj=obj->next){
+		if(!strcmp(obj->nome, nomeobj))
+			return obj;
+		else if(obj->in)
+			if(p=findobj(obj->in, nomeobj))
+				return p;
+	}
 
-	return 0;
+	return NULL;
 }
 
 void interpretacomando(){
@@ -510,15 +514,6 @@ void interpretacomando(){
 							break;
 			default: check=0;
 		}
-
-		/*if(act==0)
-			check=vai(&comando[i]);
-		else if(act==1)
-			check=prendi(&comando[i]);
-		else if(act==2)
-			check=lascia(&comando[i]);
-		else
-			check=0;*/
 
 	}while(!check);
 	return;
@@ -615,7 +610,7 @@ int vai(char comando[]){
 			printf("Non ci puoi andare\n");
 			return 0;
 		}
-	}else if(!strcmp(&comando[i],"giu")){
+	}else if(!strcmp(&comando[i],"giù")){
 		if(player->giu)
 			if(player->giuopen)
 				player=player->giu;
@@ -693,6 +688,7 @@ int apri(char comando[]){
 	int i, j;
 	char s[LENOBJ];
 	int check;
+	obj_t * obj;
 
 	i=0;
 	do
@@ -709,11 +705,58 @@ int apri(char comando[]){
 
 	if(!strcmp(s, "porta"))
 		check=apriporta(&comando[i]);
-	else if(!strcmp(s, "baule"))
-		;
-	else if(!strcmp(s, "libro"))
-		;
-	else{
+	else if(!strcmp(s, "baule")){
+		if(obj=findobj(player->oggetti, "baule")){
+			if(obj->open){
+				printf("Il baule è già aperto\n");
+				return 0;
+			}else{
+				do
+					i++;
+				while(comando[i]==' ' && comando[i]!='\0');
+				if(comando[i]=='\0'){
+					printf("Specifica con cosa aprire il baule\n");
+					return 0;
+				}
+
+				for(j=0; comando[i] != ' ' && j<LENOBJ && comando[i]!='\0'; i++, j++)
+					s[j]=comando[i];
+				s[j]='\0';
+				if(strcmp(s, "con")){
+					printf("Specifica con cosa aprire il baule\n");
+					return 0;
+				}
+
+				do
+					i++;
+				while(comando[i]==' ' && comando[i]!='\0');
+				if(comando[i]=='\0'){
+					printf("Specifica con cosa aprire il baule\n");
+					return 0;
+				}
+
+				if(!strcmp(&comando[i], "piccola chiave")){
+					if(findobj(inventario, "piccola chiave")){
+						obj->open=1;
+						printf("Il baule si apre\n");
+						check=1;
+					}else{
+						printf("Non hai questo oggetto\n");
+						return 0;
+					}
+				}else{
+					printf("Non è l'oggetto giusto\n");
+					return 0;
+				}
+			}
+		}else{
+			printf("Oggetto non trovato\n");
+			return 0;
+		}
+	}else if(!strcmp(s, "armadio")){
+		printf("L'armadio si apre\n");
+		check=1;
+	}else{
 		printf("Non è possibile aprire %s\n", &comando[i]);
 		return 0;
 	}
@@ -786,7 +829,7 @@ int apriporta(char comando[]){
 								}
 
 								if(!strcmp(&comando[i], "chiave di ferro")){
-									if(possiedi("chiave di ferro")){
+									if(findobj(inventario, "chiave di ferro")){
 										player->nordopen=1;
 										player=player->nord;
 										player->sudopen=1;
@@ -854,7 +897,7 @@ int apriporta(char comando[]){
 								}
 
 								if(!strcmp(&comando[i], "chiave di ferro")){
-									if(possiedi("chiave di ferro")){
+									if(findobj(inventario, "chiave di ferro")){
 										player->sudopen=1;
 										player=player->sud;
 										player->nordopen=1;
@@ -899,7 +942,7 @@ int apriporta(char comando[]){
 								}
 
 								if(!strcmp(&comando[i], "chiave di bronzo")){
-									if(possiedi("chiave di bronzo")){
+									if(findobj(inventario, "chiave di bronzo")){
 										player->sudopen=1;
 										player=player->sud;
 										player->nordopen=1;
@@ -944,7 +987,7 @@ int apriporta(char comando[]){
 								}
 
 								if(!strcmp(&comando[i], "chiave dorata")){
-									if(possiedi("chiave dorata")){
+									if(findobj(inventario, "chiave dorata")){
 										player->sudopen=1;
 										player=player->sud;
 										player->nordopen=1;
@@ -964,13 +1007,117 @@ int apriporta(char comando[]){
 							 return 0;
 		}
 	}else if(!strcmp(dir, "est")){
-		;
+		switch(player->id){
+			case 0: printf("La porta è già aperta\n");
+							return 0;
+			case 1: printf("La porta è già aperta\n");
+							return 0;
+			case 5: printf("La porta è già aperta\n");
+							return 0;
+			case 9: printf("La porta è già aperta\n");
+							return 0;
+			case 10: printf("La porta è già aperta\n");
+							 return 0;
+			case 12: printf("La porta è già aperta\n");
+							 return 0;
+			case 19: printf("La porta è già aperta\n");
+							 return 0;
+			default: printf("Porta non trovata\n");
+							 return 0;
+		}
 	}else if(!strcmp(dir, "ovest")){
-		;
+		switch(player->id){
+			case 0: printf("La porta è già aperta\n");
+							return 0;
+			case 10: printf("La porta è già aperta\n");
+							 return 0;
+			case 11: printf("La porta è già aperta\n");
+							 return 0;
+			case 13: printf("La porta è già aperta\n");
+							 return 0;
+			case 18: printf("La porta è già aperta\n");
+							 return 0;
+			case 2: if(player->ovestopen){
+								printf("La porta è già aperta\n");
+								return 0;
+							}else{
+								do
+									i++;
+								while(comando[i]==' ' && comando[i]!='\0');
+								if(comando[i]=='\0'){
+									printf("Specifica con cosa aprire la porta\n");
+									return 0;
+								}
+
+								for(j=0; comando[i] != ' ' && j<LENOBJ && comando[i]!='\0'; i++, j++)
+									s[j]=comando[i];
+								s[j]='\0';
+								if(strcmp(s, "con")){
+									printf("Specifica con cosa aprire la porta\n");
+									return 0;
+								}
+
+								do
+									i++;
+								while(comando[i]==' ' && comando[i]!='\0');
+								if(comando[i]=='\0'){
+									printf("Specifica con cosa aprire la porta\n");
+									return 0;
+								}
+
+								if(!strcmp(&comando[i], "chiave di ottone")){
+									if(findobj(inventario, "chiave di ottone")){
+										player->ovestopen=1;
+										player=player->ovest;
+										player->estopen=1;
+										player=player->est;
+										printf("La porta si apre\n");
+									}else{
+										printf("Non hai questo oggetto\n");
+										return 0;
+									}
+								}else{
+									printf("Non è l'oggetto giusto\n");
+									return 0;
+								}
+							}
+							break;
+			case 6: if(player->ovestopen){
+								printf("La porta è già aperta\n");
+								return 0;
+						 	}else{
+								printf("Non è l'oggetto giusto\n");
+								return 0;
+							}
+			default: printf("Porta non trovata\n");
+							 return 0;
+		}
 	}else if(!strcmp(dir, "su")){
-		;
-	}else if(!strcmp(dir, "giu")){
-		;
+		switch(player->id){
+			case 8: printf("La porta è già aperta\n");
+							return 0;
+			case 13: printf("La porta è già aperta\n");
+							 return 0;
+			case 16: printf("La porta è già aperta\n");
+							 return 0;
+			case 19: printf("La porta è già aperta\n");
+							 return 0;
+			default: printf("Porta non trovata\n");
+							 return 0;
+		}
+	}else if(!strcmp(dir, "giù")){
+		switch(player->id){
+			case 4: printf("La porta è già aperta\n");
+							return 0;
+			case 8: printf("La porta è già aperta\n");
+					  	return 0;
+			case 20: printf("La porta è già aperta\n");
+							 return 0;
+			case 21: printf("La porta è già aperta\n");
+							 return 0;
+			default: printf("Porta non trovata\n");
+							 return 0;
+		}
 	}else{
 		printf("Porta non trovata\n");
 		return 0;

@@ -8,7 +8,7 @@ libro rosso
 1 arpa
 1 pozione
 0
-1 chiave baule
+1 piccola chiave
 0
 1 chiave di ferro
 0
