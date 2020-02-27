@@ -67,6 +67,7 @@ int prendi(char[]);
 int lascia(char[]);
 int apri(char []);
 int apriporta(char []);
+int suona(char []);
 
 
 
@@ -75,6 +76,7 @@ int apriporta(char []);
 
 stanza_t* player=NULL;
 obj_t* inventario=NULL;
+int time=0;
 
 int main (int argc, char*argv[]){
 	int i;
@@ -98,7 +100,8 @@ int main (int argc, char*argv[]){
 	printf("All'inizio, il player è in %d\n",player->id);
 	printf("L'inventario è: ");
 	stampaoggetti(inventario);
-	printf("\n");
+	printf("\n\n");
+	printf("Cosa faccio?\n");
 	scanf(" "); /*Risolve il problema "Comando non trovato"*/
 	while(1){
 		interpretacomando();
@@ -107,7 +110,10 @@ int main (int argc, char*argv[]){
 		stampaoggetti(inventario);
 		printf("\nNella stanza c'è: ");
 		stampaoggetti(player->oggetti);
-		printf("\n");
+		time++;
+		printf("\nTime = %d", time);
+		printf("\n\n");
+		printf("Cosa faccio?\n");
 	}
 
 	return 0;
@@ -493,8 +499,34 @@ void interpretacomando(){
 	char comando[LENCMD], azione[LENACT];
 	int i, act, check;
 	//fgets(comando,LENCMD,stdin); /*Non va bene nel ciclo..*/
-	do{
+
+	check=1;
+	/*printf("Cosa faccio?\n");*/
+	fgets(comando,LENCMD,stdin);
+	delnewline(comando);
+	for(i=0; comando[i] != ' ' && i<LENACT && comando[i]!='\0'; i++)
+		azione[i]=comando[i];
+	azione[i]='\0';
+	act = findact(azione);
+
+	switch(act){
+		case 0: check=vai(&comando[i]);
+						break;
+		case 1: check=prendi(&comando[i]);
+						break;
+		case 2: check=lascia(&comando[i]);
+						break;
+		case 4: check=apri(&comando[i]);
+						break;
+		case 5: check=suona(&comando[i]);
+						break;
+		default: check=0;
+	}
+
+
+	while(!check){
 		check=1;
+		printf("\nCosa faccio?\n");
 		fgets(comando,LENCMD,stdin);
 		delnewline(comando);
 		for(i=0; comando[i] != ' ' && i<LENACT && comando[i]!='\0'; i++)
@@ -512,11 +544,13 @@ void interpretacomando(){
 							break;
 			case 4: check=apri(&comando[i]);
 							break;
+			case 5: check=suona(&comando[i]);
+							break;
 			default: check=0;
 		}
 
-	}while(!check);
-	return;
+	}
+
 }
 
 
@@ -554,72 +588,60 @@ int vai(char comando[]){
 		if(player->nord)
 			if(player->nordopen)
 				player=player->nord;
-			else{
+			else
 				printf("La porta è chiusa\n");
-				return 0;
-			}
 		else{
-			printf("Non ci puoi andare\n");
+			printf("Non c'è alcun varco a nord\n");
 			return 0;
 		}
 	}else if(!strcmp(&comando[i],"sud")){
 		if(player->sud)
 			if(player->sudopen)
 				player=player->sud;
-			else{
+			else
 				printf("La porta è chiusa\n");
-				return 0;
-			}
 		else{
-			printf("Non ci puoi andare\n");
+			printf("Non c'è alcun varco a sud\n");
 			return 0;
 		}
 	}else if(!strcmp(&comando[i],"est")){
 		if(player->est)
 			if(player->estopen)
 				player=player->est;
-			else{
+			else
 				printf("La porta è chiusa\n");
-				return 0;
-			}
 		else{
-			printf("Non ci puoi andare\n");
+			printf("Non c'è alcun varco a est\n");
 			return 0;
 		}
 	}else if(!strcmp(&comando[i],"ovest")){
 		if(player->ovest)
 			if(player->ovestopen)
 				player=player->ovest;
-			else{
+			else
 				printf("La porta è chiusa\n");
-				return 0;
-			}
 		else{
-			printf("Non ci puoi andare\n");
+			printf("Non c'è alcun varco a ovest\n");
 			return 0;
 		}
 	}else if(!strcmp(&comando[i],"su")){
 		if(player->su)
 			if(player->suopen)
 				player=player->su;
-			else{
+			else
 				printf("La porta è chiusa\n");
-				return 0;
-			}
 		else{
-			printf("Non ci puoi andare\n");
+			printf("Non c'è alcun varco su\n");
 			return 0;
 		}
 	}else if(!strcmp(&comando[i],"giù")){
 		if(player->giu)
 			if(player->giuopen)
 				player=player->giu;
-			else{
+			else
 				printf("La porta è chiusa\n");
-				return 0;
-			}
 		else{
-			printf("Non ci puoi andare\n");
+			printf("Non c'è alcun varco giù\n");
 			return 0;
 		}
 	}else{
@@ -746,7 +768,7 @@ int apri(char comando[]){
 					}
 				}else{
 					printf("Non è l'oggetto giusto\n");
-					return 0;
+					check=1;
 				}
 			}
 		}else{
@@ -839,10 +861,8 @@ int apriporta(char comando[]){
 										printf("Non hai questo oggetto\n");
 										return 0;
 									}
-								}else{
+								}else
 									printf("Non è l'oggetto giusto\n");
-									return 0;
-								}
 							}
 							break;
 			default: printf("Porta non trovata\n");
@@ -907,10 +927,8 @@ int apriporta(char comando[]){
 										printf("Non hai questo oggetto\n");
 										return 0;
 									}
-								}else{
+								}else
 									printf("Non è l'oggetto giusto\n");
-									return 0;
-								}
 							}
 							break;
 			case 11: if(player->sudopen){
@@ -1076,10 +1094,8 @@ int apriporta(char comando[]){
 										printf("Non hai questo oggetto\n");
 										return 0;
 									}
-								}else{
+								}else
 									printf("Non è l'oggetto giusto\n");
-									return 0;
-								}
 							}
 							break;
 			case 6: if(player->ovestopen){
@@ -1127,6 +1143,45 @@ int apriporta(char comando[]){
 }
 
 
+int suona(char comando[]){
+	int i;
+
+	i=0;
+	do
+		i++;
+	while(comando[i]==' ' && comando[i]!='\0');
+	if(comando[i]=='\0'){
+		printf("Specifica cosa suonare\n");
+		return 0;
+	}
+
+	if(!strcmp(&comando[i], "arpa")){
+		if(findobj(inventario, "arpa")){
+			if(player->id==5 && !player->estopen){
+				player->estopen=1;
+				player=player->est;
+				player->ovestopen=1;
+				player=player->ovest;
+				printf("La porta est si apre per magia!\n");
+			}else if(player->id==6 && !player->ovestopen){
+				player->ovestopen=1;
+				player=player->ovest;
+				player->estopen=1;
+				player=player->est;
+				printf("La porta ovest si apre per magia!\n");
+			}else
+				printf("Non succede niente...\n");
+		}else{
+			printf("Non possiedi questo oggetto\n");
+			return 0;
+		}
+	}else{
+		printf("Non credo si possa suonare questo oggetto\n");
+		return 0;
+	}
+
+	return 1;
+}
 
 
 

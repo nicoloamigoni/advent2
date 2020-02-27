@@ -3,3 +3,4 @@
 2 lascia
 3 guarda
 4 apri
+5 suona
